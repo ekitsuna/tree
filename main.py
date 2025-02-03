@@ -3,7 +3,7 @@ import networkx as nx
 import numpy as np
 
 G = nx.DiGraph()
-G.add_node(0) 
+G.add_node(0)  
 
 positions = {0: np.array([0.0, 0.0, 0.0])}
 velocities = {0: np.array([0.0, 0.0, 0.0])}
@@ -53,7 +53,7 @@ def update_positions():
         positions[node] += velocities[node]
 
 frames = []
-for _ in range(20):
+for _ in range(1000):
     expand_tree()
     update_positions()
 
@@ -75,7 +75,22 @@ for _ in range(20):
     frames.append(go.Frame(data=[
         go.Scatter3d(
             x=edge_x, y=edge_y, z=edge_z,
-            line=dict(width=2, color='lightblue'),
+            line=dict(width=10, color='rgba(0,0,0,0.1)'),
+            mode='lines'
+        ),
+        go.Scatter3d(
+            x=edge_x, y=edge_y, z=edge_z,
+            line=dict(width=7, color='rgba(0,0,0,0.3)'),
+            mode='lines'
+        ),
+        go.Scatter3d(
+            x=edge_x, y=edge_y, z=edge_z,
+            line=dict(width=5, color='rgba(0,0,0,0.6)'),
+            mode='lines'
+        ),
+        go.Scatter3d(
+            x=edge_x, y=edge_y, z=edge_z,
+            line=dict(width=3, color='black'),
             mode='lines'
         ),
         go.Scatter3d(
@@ -89,7 +104,7 @@ fig = go.Figure(
     data=[
         go.Scatter3d(
             x=[], y=[], z=[],
-            line=dict(width=2, color='lightblue'),
+            line=dict(width=3, color='black'),
             mode='lines'
         ),
         go.Scatter3d(
@@ -104,18 +119,42 @@ fig = go.Figure(
 fig.update_layout(
     showlegend=False,
     scene=dict(
-        xaxis=dict(showbackground=False),
-        yaxis=dict(showbackground=False),
-        zaxis=dict(showbackground=False)
+        xaxis=dict(showbackground=False, showgrid=False, visible=True, showticklabels=False, zeroline=False),
+        yaxis=dict(showbackground=False, showgrid=False, visible=True, showticklabels=False, zeroline=False),
+        zaxis=dict(showbackground=False, showgrid=False, visible=True, showticklabels=False, zeroline=False),
+        bgcolor='white'
     ),
     margin=dict(t=0, l=0, b=0, r=0),
-    paper_bgcolor='white',
-    plot_bgcolor='white'
+    paper_bgcolor='white', 
+    plot_bgcolor='white' 
 )
 
-fig.update_layout(updatemenus=[dict(type="buttons", showactive=False,
-                                    buttons=[dict(label="Play",
-                                                  method="animate",
-                                                  args=[None, dict(frame=dict(duration=200, redraw=True), fromcurrent=True)])])])
+fig.update_layout(
+    updatemenus=[
+        dict(
+            type="buttons",
+            showactive=False,
+            buttons=[
+                dict(
+                    label="Play",
+                    method="animate",
+                    args=[None, dict(frame=dict(duration=200, redraw=True), fromcurrent=True)]
+                ),
+                dict(
+                    label="Pause",
+                    method="animate",
+                    args=[[None], dict(frame=dict(duration=0, redraw=False), mode="immediate")]
+                ),
+                dict(
+                    label="Toggle Axes",
+                    method="relayout",
+                    args=[
+                        {"scene.xaxis.visible": False, "scene.yaxis.visible": False, "scene.zaxis.visible": False}
+                    ]
+                )
+            ]
+        )
+    ]
+)
 
 fig.show()
